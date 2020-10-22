@@ -19,6 +19,8 @@ async def send(websocket, return_message_bytes, return_message_is_english):
 	# if inputs are alphabets, wait for 10 sec
 	# if not, just send back and trigger the alert
 	if (return_message_is_english == 1):
+		print("(", datetime.now(), ") sleep for 10 sec")
+		print()
 		await asyncio.sleep(10)	
 
 	# send the message
@@ -53,8 +55,8 @@ def LetterCaseConverter(websocket, message):
 	print()
 
 	# queue the task of sending back message
-	asyncio.ensure_future(send(websocket,return_message_bytes,return_message.is_english), loop=loop)
-
+	#asyncio.ensure_future(send(websocket,return_message_bytes,return_message.is_english), loop=loop)
+	asyncio.run_coroutine_threadsafe(send(websocket,return_message_bytes,return_message.is_english), loop)
 
 # construct the task of a client connection
 async def OneClientTask(websocket, path):
@@ -79,7 +81,7 @@ async def OneClientTask(websocket, path):
 			# construct a thread and run the main job in the thread
 			executor.submit(LetterCaseConverter, websocket, message)
 
-			print("(", datetime.now(), ") number of threads: ", len(executor._threads))
+			#print("(", datetime.now(), ") number of threads: ", len(executor._threads))
 
 	# listen to connection and show the number of clients when a client is disconnected	
 	except websockets.exceptions.ConnectionClosed:
