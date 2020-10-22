@@ -14,8 +14,14 @@ from threading import current_thread
 
 
 # task of sending to the client
-async def send(websocket, return_message_bytes):
-		
+async def send(websocket, return_message_bytes, return_message_is_english):
+
+	# if inputs are alphabets, wait for 10 sec
+	# if not, just send back and trigger the alert
+	if (return_message_is_english == 1):
+		await asyncio.sleep(10)	
+
+	# send the message
 	await websocket.send(return_message_bytes)
 	print ("(", datetime.now(), ") send back message: ",return_message_bytes)
 	print()
@@ -46,14 +52,8 @@ def LetterCaseConverter(websocket, message):
 	print ("(", datetime.now(), ") encoded converted message: ",return_message_bytes)
 	print()
 
-	# if inputs are alphabets, wait for 10 sec
-	# if not, just send back and trigger the alert
-	if (return_message.is_english == 1):
-		time.sleep(10)
-
-	# queue the task of sending back message in the main thread
-	print("(", datetime.now(), ") prepared to send message: ", return_message_bytes)	
-	asyncio.ensure_future(send(websocket,return_message_bytes), loop=loop)
+	# queue the task of sending back message
+	asyncio.ensure_future(send(websocket,return_message_bytes,return_message.is_english), loop=loop)
 
 
 # construct the task of a client connection
